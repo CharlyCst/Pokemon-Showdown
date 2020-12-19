@@ -135,9 +135,9 @@ export const Sockets = new class {
 
 export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 	/** socketid:Connection */
-	sockets = new Map<string, import('sockjs').Connection>();
+	sockets = new Map<string, import('./ipc').Connection>();
 	/** roomid:socketid:Connection */
-	rooms = new Map<RoomID, Map<string, import('sockjs').Connection>>();
+	rooms = new Map<RoomID, Map<string, import('./ipc').Connection>>();
 	/** roomid:socketid:channelid */
 	roomChannels = new Map<RoomID, Map<string, ChannelID>>();
 
@@ -267,8 +267,8 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 		// This is the main server that handles users connecting to our server
 		// and doing things on our server.
 
-		const sockjs: typeof import('sockjs') = (require as any)('sockjs');
-		const options: import('sockjs').ServerOptions & {faye_server_options?: {[key: string]: any}} = {
+		const sockjs: typeof import('./ipc') = (require as any)('./ipc');
+		const options: import('./ipc').ServerOptions & {faye_server_options?: {[key: string]: any}} = {
 			sockjs_url: `//play.pokemonshowdown.com/js/lib/sockjs-1.4.0-nwjsfix.min.js`,
 			prefix: '/showdown',
 			log(severity: string, message: string) {
@@ -351,7 +351,7 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 		setImmediate(() => process.exit(0));
 	}
 
-	onConnection(socket: import('sockjs').Connection) {
+	onConnection(socket: import('./ipc').Connection) {
 		// For reasons that are not entirely clear, SockJS sometimes triggers
 		// this event with a null `socket` argument.
 		if (!socket) return;
@@ -410,9 +410,9 @@ export class ServerStream extends Streams.ObjectReadWriteStream<string> {
 
 	_write(data: string) {
 		// console.log('worker received: ' + data);
-		let socket: import('sockjs').Connection | undefined = undefined;
+		let socket: import('./ipc').Connection | undefined = undefined;
 		let socketid = '';
-		let room: Map<string, import('sockjs').Connection> | undefined = undefined;
+		let room: Map<string, import('./ipc').Connection> | undefined = undefined;
 		let roomid = '' as RoomID;
 		let roomChannel: Map<string, ChannelID> | undefined = undefined;
 		let channelid: ChannelID = 0;
